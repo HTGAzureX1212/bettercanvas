@@ -1650,6 +1650,14 @@ span[data-testid="submission-tray"]>div>div>div>div[class$="-view"] {
     border: 1px solid var(--bcborders) !important;
     color: var(--bctext-0) !important;
 }
+
+.user_content>table>tbody>tr>th {
+    background: var(--bcbackground-2) !important;
+}
+
+.user_content>table>tbody>tr>td {
+    background: var(--bcbackground-0) !important;
+}
 `;
     let css = (options.device_dark === true ? "@media (prefers-color-scheme: dark) {" : "") + ":root{";
     Object.keys(options.dark_preset).forEach(key => {
