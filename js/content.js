@@ -1622,6 +1622,19 @@ a[class~="toggle_comments_link"] {
     background: var(--bcbackground-2) !important;
     border: 1px solid var(--bcborders) !important;
 }
+
+span[data-testid="submission-tray"] {
+    background: var(--bcbackground-0);
+}
+
+span[data-testid="submission-tray"]>div>div>div>div[class$="-view"] {
+    color: var(--bctext-0) !important;
+    background: var(--bcbackground-2) !important;
+}
+
+.selected-assignment {
+    background: var(--bcbackground-1) !important;
+}
 `;
     let css = (options.device_dark === true ? "@media (prefers-color-scheme: dark) {" : "") + ":root{";
     Object.keys(options.dark_preset).forEach(key => {
