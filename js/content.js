@@ -1639,6 +1639,17 @@ span[data-testid="submission-tray"]>div>div>div>div[class$="-view"] {
 [class$="pill"] {
     background: var(--bcbackground-0) !important;
 }
+
+[class$="inlineBlock-avatar"] {
+    background: var(--bcbackground-0) !important;
+    border: 1px solid var(--bcborders) !important;
+}
+
+[class$="baseButton__content"] {
+    background: var(--bcbackground-1) !important;
+    border: 1px solid var(--bcborders) !important;
+    color: var(--bctext-0) !important;
+}
 `;
     let css = (options.device_dark === true ? "@media (prefers-color-scheme: dark) {" : "") + ":root{";
     Object.keys(options.dark_preset).forEach(key => {
