@@ -102,7 +102,7 @@ async function insertReminders(reminders) {
         }
         if (found === false) toAdd.push(insert);
     }
-    if (toAdd.length > 0 || overrides === true) chrome.storage.sync.set({ "reminders": [...storage["reminders"], ...toAdd] });
+    if (toAdd.length > 0 || overrides === true) chrome.storage.sync.set({"reminders": [...storage["reminders"], ...toAdd]});
 }
 
 async function hideReminder(href) {
@@ -111,7 +111,7 @@ async function hideReminder(href) {
     for (let i = 0; i < storage["reminders"].length; i++) {
         if (storage["reminders"][i]["h"] === href) {
             storage["reminders"][i]["c"]++;
-            chrome.storage.sync.set({ "reminders": storage["reminders"] });
+            chrome.storage.sync.set({"reminders": storage["reminders"]});
             break;
         }
     }
@@ -119,13 +119,20 @@ async function hideReminder(href) {
 
 function createReminder(reminder, location) {
     const remaining = getRelativeDate(new Date(reminder.d));
-    const wrapper = makeElement("div", location, { "className": "bettercanvas-reminder-wrapper" });
-    const container = makeElement("div", wrapper, { "className": "bettercanvas-reminder-container" });
-    const svg = makeElement("div", container, { "innerHTML": canvas_svg });
-    const content = makeElement("a", container, { "className": "bettercanvas-reminder-content", "href": reminder.h, "target": "_blank" });
-    const title = makeElement("h2", content, { "className": "bettercanvas-reminder-title", "textContent": reminder.t });
-    const due = makeElement("p", content, { "className": "bettercanvas-reminder-due", "textContent": `Assignment due in ${remaining.time}` });
-    const hidebtn = makeElement("btn", wrapper, { "className": "bettercanvas-reminder-hide", "textContent": "x" });
+    const wrapper = makeElement("div", location, {"className": "bettercanvas-reminder-wrapper"});
+    const container = makeElement("div", wrapper, {"className": "bettercanvas-reminder-container"});
+    const svg = makeElement("div", container, {"innerHTML": canvas_svg});
+    const content = makeElement("a", container, {
+        "className": "bettercanvas-reminder-content",
+        "href": reminder.h,
+        "target": "_blank"
+    });
+    const title = makeElement("h2", content, {"className": "bettercanvas-reminder-title", "textContent": reminder.t});
+    const due = makeElement("p", content, {
+        "className": "bettercanvas-reminder-due",
+        "textContent": `Assignment due in ${remaining.time}`
+    });
+    const hidebtn = makeElement("btn", wrapper, {"className": "bettercanvas-reminder-hide", "textContent": "x"});
     hidebtn.addEventListener("click", () => {
         hideReminder(reminder.h);
         wrapper.remove();
@@ -139,7 +146,7 @@ async function reminderWatch() {
         if (document.getElementById("bettercanvas-reminders")) document.getElementById("bettercanvas-reminders").style.display = "none";
         return;
     }
-    const container = document.getElementById("bettercanvas-reminders") || makeElement("div", document.body, { "id": "bettercanvas-reminders" });
+    const container = document.getElementById("bettercanvas-reminders") || makeElement("div", document.body, {"id": "bettercanvas-reminders"});
     container.style.display = "flex";
     container.textContent = "";
     const alertPeriod = 1000 * 60 * 60 * 6; // 6 hours
@@ -153,7 +160,7 @@ async function reminderWatch() {
             createReminder(reminder, container);
         }
     });
-    chrome.storage.sync.set({ "reminders": storage["reminders"] });
+    chrome.storage.sync.set({"reminders": storage["reminders"]});
 }
 
 function updateReminders() {
@@ -168,20 +175,25 @@ function updateReminders() {
             if (due > now + fiveDays * 2) return;
             // { due, title, href, hide count }
             // hide count of -1 indicates the item has a submission
-            list.push({ "d": due, "t": item.plannable.title, "h": domain + item.html_url, "c": item?.submissions?.submitted || false ? -1 : 0 });
+            list.push({
+                "d": due,
+                "t": item.plannable.title,
+                "h": domain + item.html_url,
+                "c": item?.submissions?.submitted || false ? -1 : 0
+            });
         });
         insertReminders(list);
     });
 }
 
 function showExampleReminder() {
-    const location = document.getElementById("bettercanvas-reminders") || makeElement("div", document.body, { "id": "bettercanvas-reminders" });
+    const location = document.getElementById("bettercanvas-reminders") || makeElement("div", document.body, {"id": "bettercanvas-reminders"});
     if (options.remind !== true) {
         location.remove();
         return;
     }
     location.textContent = "";
-    const example = createReminder({ "d": new Date(), "t": "This is an example reminder", }, location);
+    const example = createReminder({"d": new Date(), "t": "This is an example reminder",}, location);
     example.querySelector(".bettercanvas-reminder-due").textContent = "This notification will pop up in other pages to remind you of incomplete assignments that are due in less than 6 hours." /*It will notify again at 2 hours if the 'Remind 2x' option is on."*/;
 }
 
@@ -217,7 +229,7 @@ function startExtension() {
     toggleDarkMode();
 
     chrome.storage.sync.get(null, result => {
-        options = { ...options, ...result };
+        options = {...options, ...result};
         toggleAutoDarkMode();
         getApiData();
         checkDashboardReady();
@@ -242,7 +254,7 @@ function applyOptionsChanges(changes) {
     Object.keys(changes).forEach(key => {
         rewrite[key] = changes[key].newValue;
     });
-    options = { ...options, ...rewrite };
+    options = {...options, ...rewrite};
 
     // when an option is updated it will call the necessary functions again
     // so any changes made in the menu no longer require a refresh to apply
@@ -331,6 +343,7 @@ function applyOptionsChanges(changes) {
 }
 
 let insertTimer;
+
 function resetTimer() {
     clearTimeout(insertTimer);
     insertTimer = setTimeout(() => {
@@ -369,7 +382,7 @@ function checkDashboardReady() {
     };
 
     const observer = new MutationObserver(callback);
-    observer.observe(document.querySelector('html'), { childList: true, subtree: true });
+    observer.observe(document.querySelector('html'), {childList: true, subtree: true});
 }
 
 function recieveMessage(request, sender, sendResponse) {
@@ -382,18 +395,28 @@ function recieveMessage(request, sender, sendResponse) {
             }
             sendResponse(true);
             break;
-        case ("setcolors"): changeColorPreset(request.options); sendResponse(true); break;
-        case ("getcolors"): sendResponse(getCardColors()); break;
-        case ("inspect"): sendResponse(inspectDarkMode(true)); break;
-        case ("fixdm"): sendResponse(runDarkModeFixer(true)); break;
-        default: sendResponse(true);
+        case ("setcolors"):
+            changeColorPreset(request.options);
+            sendResponse(true);
+            break;
+        case ("getcolors"):
+            sendResponse(getCardColors());
+            break;
+        case ("inspect"):
+            sendResponse(inspectDarkMode(true));
+            break;
+        case ("fixdm"):
+            sendResponse(runDarkModeFixer(true));
+            break;
+        default:
+            sendResponse(true);
     }
 }
 
 function hexToRgb(hex) {
     let match = (/#(.{2})(.{2})(.{2})/).exec(hex);
     if (match) {
-        return { "r": parseInt(match[1], 16), "g": parseInt(match[2], 16), "b": parseInt(match[3], 16) };
+        return {"r": parseInt(match[1], 16), "g": parseInt(match[2], 16), "b": parseInt(match[3], 16)};
     }
 }
 
@@ -456,7 +479,7 @@ function inspectDarkMode(withOutput = false) {
 
     });
     console.log("done fixing dark mode - time:", performance.now() - time, "total backgrounds changed: ", bgcount, ", total colors changed: ", textcount);
-    return { "selectors": output === "" ? "no gaps determined" : output, "time": performance.now() - time };
+    return {"selectors": output === "" ? "no gaps determined" : output, "time": performance.now() - time};
 }
 
 function getCardColors() {
@@ -464,7 +487,7 @@ function getCardColors() {
     let colors = [];
     cards.forEach(card => {
         let rgbColor = card.querySelector(".ic-DashboardCard__header_hero").style.backgroundColor;
-        colors.push({ "href": card.querySelector(".ic-DashboardCard__link").href, "color": rgbToHex(rgbColor) });
+        colors.push({"href": card.querySelector(".ic-DashboardCard__link").href, "color": rgbToHex(rgbColor)});
     });
     colors.sort((a, b) => a.href > b.href ? 1 : -1);
     colors = colors.map(x => x.color);
@@ -487,15 +510,25 @@ function getCardsFromDashboard() {
 
                 if (!cards[id]) {
                     newCards = true;
-                    cards[id] = { "default": card.querySelector(".ic-DashboardCard__header-subtitle").textContent.substring(0, 20), "name": "", "code": "", "img": "", "hidden": false, "weight": "regular", "credits": 1, "eid": 100000 - count, "gr": null };
-    
+                    cards[id] = {
+                        "default": card.querySelector(".ic-DashboardCard__header-subtitle").textContent.substring(0, 20),
+                        "name": "",
+                        "code": "",
+                        "img": "",
+                        "hidden": false,
+                        "weight": "regular",
+                        "credits": 1,
+                        "eid": 100000 - count,
+                        "gr": null
+                    };
+
                     let links = [];
                     for (let i = 0; i < 4; i++) {
-                        links.push({ "path": "default", "is_default": true });
+                        links.push({"path": "default", "is_default": true});
                     }
-                    cards_2[id] = { "links": links };
-        
-                    cards_3[id] = { "url": domain };
+                    cards_2[id] = {"links": links};
+
+                    cards_3[id] = {"url": domain};
                 }
                 count++;
             });
@@ -530,9 +563,9 @@ function getCardsFromDashboard() {
             console.log("Error getting dashboard cards\n", e);
             logError(e);
         } finally {
-            if(newCards !== true) return;
+            if (newCards !== true) return;
             console.log(newCards ? "new cards found" : "");
-            chrome.storage.sync.set({ "custom_cards": cards, "custom_cards_2": cards_2, "custom_cards_3": cards_3 });
+            chrome.storage.sync.set({"custom_cards": cards, "custom_cards_2": cards_2, "custom_cards_3": cards_3});
         }
     });
 }
@@ -557,7 +590,17 @@ async function getCards(api = null) {
                 let id = card.id;
                 if (!cards || !cards[id]) {
                     newCards = true;
-                    cards[id] = { "default": card.course_code.substring(0, 20), "name": "", "code": "", "img": "", "hidden": false, "weight": "regular", "credits": 1, "eid": card.enrollment_term_id || 0, "gr": null };
+                    cards[id] = {
+                        "default": card.course_code.substring(0, 20),
+                        "name": "",
+                        "code": "",
+                        "img": "",
+                        "hidden": false,
+                        "weight": "regular",
+                        "credits": 1,
+                        "eid": card.enrollment_term_id || 0,
+                        "gr": null
+                    };
                 } else if (cards && cards[id]) {
                     newCards = true;
                     cards[id].default = card.course_code.substring(0, 20);
@@ -569,15 +612,15 @@ async function getCards(api = null) {
                     let links = [];
 
                     for (let i = 0; i < 4; i++) {
-                        links.push({ "path": "default", "is_default": true });
+                        links.push({"path": "default", "is_default": true});
                     }
 
-                    cards_2[id] = { "links": links };
+                    cards_2[id] = {"links": links};
                 }
 
                 if (!cards_3 || !cards_3[id]) {
                     newCards = true;
-                    cards_3[id] = { "url": domain };
+                    cards_3[id] = {"url": domain};
                 }
                 count++;
 
@@ -608,7 +651,11 @@ async function getCards(api = null) {
         } catch (e) {
             console.log(e);
         } finally {
-            return chrome.storage.sync.set(newCards ? { "custom_cards": cards, "custom_cards_2": cards_2, "custom_cards_3": cards_3 } : {});
+            return chrome.storage.sync.set(newCards ? {
+                "custom_cards": cards,
+                "custom_cards_2": cards_2,
+                "custom_cards_3": cards_3
+            } : {});
         }
     });
 }
@@ -630,12 +677,19 @@ function setAssignmentState(id, updates) {
         });
         states = newStates;
     }
-    states[id] = states[id] ? { ...states[id], ...updates } : updates;
-    chrome.storage.sync.set({ assignment_states: states }).then(() => { cardAssignments = preloadAssignmentEls(); loadBetterTodo(); loadCardAssignments(); });
+    states[id] = states[id] ? {...states[id], ...updates} : updates;
+    chrome.storage.sync.set({assignment_states: states}).then(() => {
+        cardAssignments = preloadAssignmentEls();
+        loadBetterTodo();
+        loadCardAssignments();
+    });
 }
 
 function createTodoCreateBtn(location) {
-    let confirmButton = makeElement("button", location, { "className": "bettercanvas-custom-btn", "textContent": "Create" });
+    let confirmButton = makeElement("button", location, {
+        "className": "bettercanvas-custom-btn",
+        "textContent": "Create"
+    });
     confirmButton.addEventListener("click", () => {
         chrome.storage.sync.get("custom_assignments_overflow", overflow => {
             chrome.storage.sync.get(overflow["custom_assignments_overflow"], storage => {
@@ -644,11 +698,11 @@ function createTodoCreateBtn(location) {
                 const assignment = {
                     "plannable_id": new Date().getTime(),
                     "context_name": options.custom_cards[location.querySelector("#bettercanvas-custom-course").value].default,
-                    "plannable": { "title": location.querySelector("#bettercanvas-custom-name").value },
+                    "plannable": {"title": location.querySelector("#bettercanvas-custom-name").value},
                     "plannable_date": location.querySelector("#bettercanvas-custom-date").value + "T" + location.querySelector("#bettercanvas-custom-time").value + ":00",
-                    "planner_override": { "marked_complete": false, "custom": true },
+                    "planner_override": {"marked_complete": false, "custom": true},
                     "plannable_type": "assignment",
-                    "submissions": { "submitted": false },
+                    "submissions": {"submitted": false},
                     "course_id": course_id,
                     "html_url": `/courses/${course_id}/assignments`
                 };
@@ -667,14 +721,17 @@ function createTodoCreateBtn(location) {
                 let findOpenOverflow = (num) => {
                     let current_overflow = overflow["custom_assignments_overflow"][num];
                     storage[current_overflow].push(assignment);
-                    chrome.storage.sync.set({ [current_overflow]: storage[current_overflow] }, () => {
+                    chrome.storage.sync.set({[current_overflow]: storage[current_overflow]}, () => {
                         /* assuming any error is because the limit is exceeded */
                         if (chrome.runtime.lastError) {
                             if (num === overflow["custom_assignments_overflow"].length - 1) {
                                 console.log("all overflows are full! creating new overflow " + (overflow["custom_assignments_overflow"].length + 1));
                                 let new_overflow = "custom_assignments_" + (overflow["custom_assignments_overflow"].length + 1);
                                 overflow["custom_assignments_overflow"].push(new_overflow);
-                                chrome.storage.sync.set({ [new_overflow]: [assignment], "custom_assignments_overflow": overflow["custom_assignments_overflow"] }).then(reload);
+                                chrome.storage.sync.set({
+                                    [new_overflow]: [assignment],
+                                    "custom_assignments_overflow": overflow["custom_assignments_overflow"]
+                                }).then(reload);
                             } else {
                                 console.log("overflow " + (num + 1) + " full...");
                                 findOpenOverflow(num + 1);
@@ -694,10 +751,13 @@ function createTodoCreateBtn(location) {
 }
 
 function createTodoHeader(location) {
-    let todoHeader = makeElement("h2", location, { "className": "todo-list-header", "style": "display: flex; align-items:center; justify-content:space-between;" });
+    let todoHeader = makeElement("h2", location, {
+        "className": "todo-list-header",
+        "style": "display: flex; align-items:center; justify-content:space-between;"
+    });
     //todoHeader.style = "display: flex; align-items:center; justify-content:space-between;";
     if (!options.custom_cards || Object.keys(options.custom_cards).length === 0) return;
-    let addFillout = makeElement("div", location, { "className": "bettercanvas-add-assignment" });
+    let addFillout = makeElement("div", location, {"className": "bettercanvas-add-assignment"});
     let now = new Date();
     let year = now.getFullYear();
     let month = now.getMonth() + 1;
@@ -709,13 +769,16 @@ function createTodoHeader(location) {
     let selectCourse = document.querySelector("#bettercanvas-custom-course");
     Object.keys(options.custom_cards).forEach(id => {
         let card = options.custom_cards[id];
-        let courseName = makeElement("option", selectCourse, { "className": "bettercanvas-select-course-option", "textContent": card.default });
+        let courseName = makeElement("option", selectCourse, {
+            "className": "bettercanvas-select-course-option",
+            "textContent": card.default
+        });
         courseName.value = id;
     });
 
     createTodoCreateBtn(addFillout);
-    let headerText = makeElement("span", todoHeader, { "className": "bettercanvas-todo-header", "textContent": "To Do" });
-    let addButton = makeElement("button", todoHeader, { "className": "bettercanvas-custom-btn", "textContent": "+ Add" });
+    let headerText = makeElement("span", todoHeader, {"className": "bettercanvas-todo-header", "textContent": "To Do"});
+    let addButton = makeElement("button", todoHeader, {"className": "bettercanvas-custom-btn", "textContent": "+ Add"});
     addButton.addEventListener("click", () => {
         addFillout.classList.toggle("bettercanvas-custom-open");
     });
@@ -737,14 +800,17 @@ function createTodoHeader(location) {
 function createTodoSections(location) {
     let todoHeader = createTodoHeader(location);
 
-    let todoAssignments = makeElement("ul", location, { "id": "bettercanvas-todo-list" });
+    let todoAssignments = makeElement("ul", location, {"id": "bettercanvas-todo-list"});
     /*
     let todoAssignments = document.createElement("ul");
     todoAssignments.id = "bettercanvas-todo-list";
     location.appendChild(todoAssignments);
     */
-    let announcementHeader = makeElement("h2", location, { "className": "todo-list-header", "textContent": "Announcements" });
-    let todoAnnouncements = makeElement("ul", location, { "id": "bettercanvas-announcement-list" });
+    let announcementHeader = makeElement("h2", location, {
+        "className": "todo-list-header",
+        "textContent": "Announcements"
+    });
+    let todoAnnouncements = makeElement("ul", location, {"id": "bettercanvas-announcement-list"});
     /*
     let todoAnnouncements = document.createElement("ul");
     todoAnnouncements.id = "bettercanvas-announcement-list";
@@ -758,7 +824,10 @@ function createTodoSections(location) {
 }
 
 function createTodoViewMore(location, type) {
-    let viewMoreButton = makeElement("button", location, { "className": "bettercanvas-custom-btn bettercanvas-viewmore-btn", "textContent": "View More" });
+    let viewMoreButton = makeElement("button", location, {
+        "className": "bettercanvas-custom-btn bettercanvas-viewmore-btn",
+        "textContent": "View More"
+    });
     //viewMoreButton.classList.add("bettercanvas-viewmore-btn");
     const showMoreCount = 3;
     viewMoreButton.addEventListener("click", function (e) {
@@ -782,7 +851,7 @@ function setupBetterTodo() {
         const feedback = list.querySelector(".events_list.recent_feedback");
 
         list.textContent = "";
-        list = makeElement("div", list, { "className": "bettercanvas-todosidebar" });
+        list = makeElement("div", list, {"className": "bettercanvas-todosidebar"});
         createTodoSections(list);
 
         if (feedback) list.append(feedback);
@@ -796,6 +865,7 @@ let delay;
 let moreAssignmentCount = 0;
 let moreAnnouncementCount = 0;
 let filter = "todo";
+
 function loadBetterTodo() {
     if (options.better_todo !== true) return;
     try {
@@ -828,11 +898,20 @@ function loadBetterTodo() {
 
                     let svg;
                     switch (item.plannable_type) {
-                        case "assignment": svg = assignment_svg; break;
-                        case "discussion_topic": svg = discussion_svg; break;
-                        case "quiz": svg = quiz_svg; break;
-                        case "announcement": svg = announcement_svg; break;
-                        default: return;
+                        case "assignment":
+                            svg = assignment_svg;
+                            break;
+                        case "discussion_topic":
+                            svg = discussion_svg;
+                            break;
+                        case "quiz":
+                            svg = quiz_svg;
+                            break;
+                        case "announcement":
+                            svg = announcement_svg;
+                            break;
+                        default:
+                            return;
                     }
 
                     // if (item.plannable_type === "announcement") {
@@ -856,16 +935,28 @@ function loadBetterTodo() {
 
                     let listItem = listItemContainer.querySelector(".bettercanvas-todo-item");
                     if (itemState?.["lbl"] && itemState["lbl"] !== "") {
-                        makeElement("span", listItem.querySelector(".bettercanvas-todo-item-header"), { "className": "bettercanvas-todo-label", "textContent": itemState["lbl"] });
+                        makeElement("span", listItem.querySelector(".bettercanvas-todo-item-header"), {
+                            "className": "bettercanvas-todo-label",
+                            "textContent": itemState["lbl"]
+                        });
                     }
                     if (itemState?.["crs"] === true) {
                         listItemContainer.querySelector(".bettercanvas-todo-item").style.textDecoration = "line-through";
                     }
-                    let title = makeElement("a", listItem.querySelector(".bettercanvas-todo-item-header"), { "className": "bettercanvas-todoitem-title", "textContent": item.plannable.title });
+                    let title = makeElement("a", listItem.querySelector(".bettercanvas-todo-item-header"), {
+                        "className": "bettercanvas-todoitem-title",
+                        "textContent": item.plannable.title
+                    });
                     if (options.todo_colors === true) title.style = "color:" + (options.custom_cards_3?.[item.course_id]?.color || "inherit") + "!important;";
-                    makeElement("p", listItem, { "className": "bettercanvas-todoitem-course", "textContent": item.context_name });
+                    makeElement("p", listItem, {
+                        "className": "bettercanvas-todoitem-course",
+                        "textContent": item.context_name
+                    });
                     let format = formatTodoDate(date, item.submissions, hr24);
-                    let todoDate = makeElement("p", listItem, { "className": "bettercanvas-todoitem-date", "textContent": format.date });
+                    let todoDate = makeElement("p", listItem, {
+                        "className": "bettercanvas-todoitem-date",
+                        "textContent": format.date
+                    });
                     if (format.dueSoon) todoDate.classList.add("bettercanvas-due-soon");
 
                     if (options.hover_preview === true) {
@@ -939,24 +1030,41 @@ function loadBetterTodo() {
                         }, 100);
                     });
 
-                    let removeBtn = makeElement("div", actions, { "className": "bettercanvas-todo-action", "textContent": "Remove" });
+                    let removeBtn = makeElement("div", actions, {
+                        "className": "bettercanvas-todo-action",
+                        "textContent": "Remove"
+                    });
                     removeBtn.innerHTML += x_svg;
                     const dueAt = new Date(item.plannable_date).getTime();
 
-                    let crossOffBtn = makeElement("div", actions, { "className": "bettercanvas-todo-action", "textContent": "Cross off" });
+                    let crossOffBtn = makeElement("div", actions, {
+                        "className": "bettercanvas-todo-action",
+                        "textContent": "Cross off"
+                    });
                     crossOffBtn.innerHTML += check_svg;
                     crossOffBtn.addEventListener("click", () => {
-                        setAssignmentState(item.plannable_id, { "crs": listItemContainer.querySelector(".bettercanvas-todo-item").style.textDecoration === "line-through" ? false : true, "expire": dueAt });
+                        setAssignmentState(item.plannable_id, {
+                            "crs": listItemContainer.querySelector(".bettercanvas-todo-item").style.textDecoration === "line-through" ? false : true,
+                            "expire": dueAt
+                        });
                     });
-                    let label = makeElement("span", actions, { "className": "bettercanvas-todo-action-tag", "textContent": "Label:" });
+                    let label = makeElement("span", actions, {
+                        "className": "bettercanvas-todo-action-tag",
+                        "textContent": "Label:"
+                    });
                     label.innerHTML += tag_svg;
-                    let labelInput = makeElement("input", actions, { "className": "bettercanvas-todo-input", "type": "text", "placeholder": "Label", "value": itemState && itemState["lbl"] ? itemState["lbl"] : "" });
+                    let labelInput = makeElement("input", actions, {
+                        "className": "bettercanvas-todo-input",
+                        "type": "text",
+                        "placeholder": "Label",
+                        "value": itemState && itemState["lbl"] ? itemState["lbl"] : ""
+                    });
                     labelInput.addEventListener("change", (e) => {
-                        setAssignmentState(item.plannable_id, { "lbl": e.target.value, "expire": dueAt });
+                        setAssignmentState(item.plannable_id, {"lbl": e.target.value, "expire": dueAt});
                     });
 
                     removeBtn.addEventListener('click', function () {
-                        setAssignmentState(item.plannable_id, { "rem": filter === "todo", "expire": dueAt });
+                        setAssignmentState(item.plannable_id, {"rem": filter === "todo", "expire": dueAt});
                         if (item.planner_override && item.planner_override.custom && item.planner_override.custom === true) {
                             // set item as complete locally
                             chrome.storage.sync.get("custom_assignments_overflow", overflow => {
@@ -965,7 +1073,7 @@ function loadBetterTodo() {
                                         for (let i = 0; i < storage[overflow].length; i++) {
                                             if (storage[overflow][i].plannable_id === item.plannable_id) {
                                                 storage[overflow].splice(i, 1);
-                                                chrome.storage.sync.set({ [overflow]: storage[overflow] }).then(() => {
+                                                chrome.storage.sync.set({[overflow]: storage[overflow]}).then(() => {
                                                 });
                                                 break;
                                             }
@@ -1075,7 +1183,7 @@ function loadBetterTodo() {
                     }
                     if (i !== assignmentsToInsert.length) createTodoViewMore(todoAssignments, "assignment");
                 } else {
-                    makeElement("p", todoAssignments, { "className": "bettercanvas-none-due", "textContent": "None" });
+                    makeElement("p", todoAssignments, {"className": "bettercanvas-none-due", "textContent": "None"});
                 }
 
                 // appending announcements all at once
@@ -1087,7 +1195,7 @@ function loadBetterTodo() {
                     }
                     if (i !== -1) createTodoViewMore(todoAnnouncements, "announcement");
                 } else {
-                    makeElement("p", todoAnnouncements, { "className": "bettercanvas-none-due", "textContent": "None" });
+                    makeElement("p", todoAnnouncements, {"className": "bettercanvas-none-due", "textContent": "None"});
                 }
 
                 cleanCustomAssignments();
@@ -1105,6 +1213,7 @@ Card color palettes
 
 let changeColorInterval = null;
 let colorChanges = [];
+
 async function changeColorPreset(colors) {
 
     if (colors.length === 0) return;
@@ -1121,7 +1230,7 @@ async function changeColorPreset(colors) {
     let cards = document.querySelectorAll(".ic-DashboardCard__header");
     let sortedCards = [];
     cards.forEach(card => {
-        sortedCards.push({ "href": card.querySelector(".ic-DashboardCard__link").href, "el": card });
+        sortedCards.push({"href": card.querySelector(".ic-DashboardCard__link").href, "el": card});
     });
     sortedCards.sort((a, b) => a.href > b.href ? 1 : -1);
 
@@ -1147,12 +1256,12 @@ async function changeColorPreset(colors) {
                             'accept': 'application/json',
                             'X-CSRF-Token': csrfToken,
                         },
-                        body: JSON.stringify({ "hexcode": colors[cnum] })
+                        body: JSON.stringify({"hexcode": colors[cnum]})
                     }).then(() => {
-                        card.el.querySelector(".ic-DashboardCard__header_hero").style.backgroundColor = colors[cnum];
-                        card.el.querySelector(".ic-DashboardCard__header-title span").style.color = colors[cnum];
-                        card.el.querySelector(".ic-DashboardCard__header-button-bg").style.backgroundColor = colors[cnum];
-                    });
+                    card.el.querySelector(".ic-DashboardCard__header_hero").style.backgroundColor = colors[cnum];
+                    card.el.querySelector(".ic-DashboardCard__header-title span").style.color = colors[cnum];
+                    card.el.querySelector(".ic-DashboardCard__header-button-bg").style.backgroundColor = colors[cnum];
+                });
             }
 
             colorChanges.push(changeCardColor);
@@ -1184,7 +1293,7 @@ async function changeColorPreset(colors) {
     chrome.storage.local.get("previous_colors", local => {
         const now = Date.now();
         if (local["previous_colors"] === null || now >= local["previous_colors"].expire) {
-            chrome.storage.local.set({ "previous_colors": { "colors": previous, "expire": now + 86400000 } });
+            chrome.storage.local.set({"previous_colors": {"colors": previous, "expire": now + 86400000}});
         }
     });
 }
@@ -1204,6 +1313,7 @@ function generateDarkModeCSS() {
 }
 
 let darkStyleInserted = false;
+
 function toggleDarkMode() {
     const css = generateDarkModeCSS();
     if ((options.dark_mode === true || options.device_dark === true) && !darkStyleInserted) {
@@ -1229,10 +1339,13 @@ function toggleDarkMode() {
 }
 
 function runDarkModeFixer(override = false) {
-    if (options.dark_mode !== true) return { "path": "bettercanvas-darkmode_off", "time": "" };
-    if (override === false && !options["dark_mode_fix"].includes(window.location.pathname)) return { "path": "bettercanvas-none", "time": "" };
+    if (options.dark_mode !== true) return {"path": "bettercanvas-darkmode_off", "time": ""};
+    if (override === false && !options["dark_mode_fix"].includes(window.location.pathname)) return {
+        "path": "bettercanvas-none",
+        "time": ""
+    };
     let output = inspectDarkMode();
-    return { "path": window.location.pathname, "time": output.time };
+    return {"path": window.location.pathname, "time": output.time};
 }
 
 function autoDarkModeCheck() {
@@ -1256,7 +1369,7 @@ function autoDarkModeCheck() {
     }
     if (options.auto_dark === true) {
         options.dark_mode = status;
-        chrome.storage.sync.set({ "dark_mode": status }, toggleDarkMode);
+        chrome.storage.sync.set({"dark_mode": status}, toggleDarkMode);
     }
 }
 
@@ -1268,6 +1381,7 @@ function toggleAutoDarkMode() {
 }
 
 let iframeObserver;
+
 function runiframeChecker() {
     if (current_page === "/" || current_page === "") return;
 
@@ -1296,7 +1410,7 @@ function runiframeChecker() {
     };
 
     iframeObserver = new MutationObserver(callback);
-    iframeObserver.observe(document.querySelector('html'), { childList: true, subtree: true });
+    iframeObserver.observe(document.querySelector('html'), {childList: true, subtree: true});
 }
 
 /* 
@@ -1316,7 +1430,10 @@ function insertGrades() {
                             let gradepercent = grade.enrollments[0].has_grading_periods === true ? grade.enrollments[0].current_period_computed_current_score : grade.enrollments[0].computed_current_score;
                             //let gradepercent = grade.enrollments[0].computed_current_score;
                             let percent = (gradepercent || "--") + "%";
-                            let gradeContainer = cards[i].querySelector(".bettercanvas-card-grade") || makeElement("a", cards[i].querySelector(".ic-DashboardCard__header"), { "className": "bettercanvas-card-grade", "textContent": percent });
+                            let gradeContainer = cards[i].querySelector(".bettercanvas-card-grade") || makeElement("a", cards[i].querySelector(".ic-DashboardCard__header"), {
+                                "className": "bettercanvas-card-grade",
+                                "textContent": percent
+                            });
                             if (options.grade_hover === true) {
                                 gradeContainer.classList.add("bettercanvas-hover-only");
                             } else {
@@ -1359,8 +1476,15 @@ function setAssignmentStatus(id, status, assignments_done = []) {
 function createCardAssignment(assignment) {
     let assignmentContainer = document.createElement("div");
     assignmentContainer.className = "bettercanvas-assignment-container";
-    let assignmentName = makeElement("a", assignmentContainer, { "className": "bettercanvas-assignment-link", "textContent": assignment.plannable.title, "href": assignment.html_url });
-    let assignmentDueAt = makeElement("span", assignmentContainer, { "className": "bettercanvas-assignment-dueat", "textContent": formatCardDue(new Date(assignment.plannable_date)) });
+    let assignmentName = makeElement("a", assignmentContainer, {
+        "className": "bettercanvas-assignment-link",
+        "textContent": assignment.plannable.title,
+        "href": assignment.html_url
+    });
+    let assignmentDueAt = makeElement("span", assignmentContainer, {
+        "className": "bettercanvas-assignment-dueat",
+        "textContent": formatCardDue(new Date(assignment.plannable_date))
+    });
     if (assignment.overdue === true) assignmentDueAt.classList.add("bettercanvas-assignment-overdue");
     if (assignment?.submissions?.submitted === true) {
         assignmentContainer.classList.add("bettercanvas-completed");
@@ -1372,7 +1496,7 @@ function createCardAssignment(assignment) {
     assignmentDueAt.addEventListener('mouseup', function () {
         assignmentContainer.classList.toggle("bettercanvas-completed");
         const status = assignmentContainer.classList.contains("bettercanvas-completed");
-        setAssignmentState(assignment.plannable_id, { "crs": status, "expire": assignment.plannable_date });
+        setAssignmentState(assignment.plannable_id, {"crs": status, "expire": assignment.plannable_date});
     });
     return assignmentContainer;
 }
@@ -1442,8 +1566,11 @@ function loadCardAssignments() {
                 }
 
                 if (count === 0) {
-                    let assignmentContainer = makeElement("div", cardContainer, { "className": "bettercanvas-assignment-container" });
-                    let assignmentDivLink = makeElement("a", assignmentContainer, { "className": "bettercanvas-assignment-link", "textContent": "None" });
+                    let assignmentContainer = makeElement("div", cardContainer, {"className": "bettercanvas-assignment-container"});
+                    let assignmentDivLink = makeElement("a", assignmentContainer, {
+                        "className": "bettercanvas-assignment-link",
+                        "textContent": "None"
+                    });
                 }
             });
         } catch (e) {
@@ -1512,11 +1639,14 @@ function setupCardAssignments() {
         if (document.querySelectorAll('.ic-DashboardCard').length > 0 && document.querySelectorAll('.bettercanvas-card-container').length > 0) return;
         let cards = document.querySelectorAll('.ic-DashboardCard');
         cards.forEach(card => {
-            let assignmentContainer = card.querySelector(".bettercanvas-card-assignment") || makeElement("div", card, { "className": "bettercanvas-card-assignment" });
-            let assignmentsDueHeader = card.querySelector(".bettercanvas-card-header-container") || makeElement("div", assignmentContainer, { "className": "bettercanvas-card-header-container" });
-            let assignmentsDueLabel = card.querySelector(".bettercanvas-card-header") || makeElement("h3", assignmentsDueHeader, { "className": "bettercanvas-card-header", "textContent": chrome.i18n.getMessage("due") });
-            let cardContainer = card.querySelector(".bettercanvas-card-container") || makeElement("div", assignmentContainer, { "className": "bettercanvas-card-container" });
-            let skeletonText = card.querySelector(".bettercanvas-skeleton-text") || makeElement("div", cardContainer, { "className": "bettercanvas-skeleton-text" });
+            let assignmentContainer = card.querySelector(".bettercanvas-card-assignment") || makeElement("div", card, {"className": "bettercanvas-card-assignment"});
+            let assignmentsDueHeader = card.querySelector(".bettercanvas-card-header-container") || makeElement("div", assignmentContainer, {"className": "bettercanvas-card-header-container"});
+            let assignmentsDueLabel = card.querySelector(".bettercanvas-card-header") || makeElement("h3", assignmentsDueHeader, {
+                "className": "bettercanvas-card-header",
+                "textContent": chrome.i18n.getMessage("due")
+            });
+            let cardContainer = card.querySelector(".bettercanvas-card-container") || makeElement("div", assignmentContainer, {"className": "bettercanvas-card-container"});
+            let skeletonText = card.querySelector(".bettercanvas-skeleton-text") || makeElement("div", cardContainer, {"className": "bettercanvas-skeleton-text"});
         });
     } catch (e) {
         logError(e);
@@ -1567,7 +1697,7 @@ function customizeCards(c = null) {
                 }
             } else if (cardOptions.img !== "") {
                 let topColor = card.querySelector(".ic-DashboardCard__header_hero");
-                let container = card.querySelector(".ic-DashboardCard__header_image") || makeElement("div", card, { "className": "ic-DashboardCard__header_image" });
+                let container = card.querySelector(".ic-DashboardCard__header_image") || makeElement("div", card, {"className": "ic-DashboardCard__header_image"});
                 card.querySelector(".ic-DashboardCard__header").prepend(container);
                 container.appendChild(topColor);
                 container.style.backgroundImage = "url(\"" + cardOptions.img + "\")";
@@ -1587,11 +1717,11 @@ function customizeCards(c = null) {
             // card links
             let links = card.querySelectorAll(".ic-DashboardCard__action");
             for (let i = links.length; i < 4; i++) {
-                makeElement("a", card.querySelector(".ic-DashboardCard__action-container"), { "className": "ic-DashboardCard__action" });
+                makeElement("a", card.querySelector(".ic-DashboardCard__action-container"), {"className": "ic-DashboardCard__action"});
             }
             links = card.querySelectorAll(".ic-DashboardCard__action");
             for (let i = 0; i < 4; i++) {
-                let img = links[i].querySelector(".bettercanvas-link-image") || makeElement("img", links[i], { "className": "bettercanvas-link-image" });
+                let img = links[i].querySelector(".bettercanvas-link-image") || makeElement("img", links[i], {"className": "bettercanvas-link-image"});
                 links[i].style.display = "inherit";
                 if (cardOptions_2.links[i].path === "none") {
                     links[i].style.display = "none";
@@ -1622,13 +1752,14 @@ function getCustomLinkImage(path) {
     } else if (path.includes("docs.google")) {
         return "https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico";
     } else {
-        let url = { "hostname": "instructure.com/" };
+        let url = {"hostname": "instructure.com/"};
         try {
             url = new URL(path);
         } catch (e) {
             logError(e);
         }
-        return "https://" + url.hostname + "/favicon.ico";;
+        return "https://" + url.hostname + "/favicon.ico";
+        ;
     }
 }
 
@@ -1693,20 +1824,19 @@ function calculateGPA2() {
             cumulativeCredits = credits;
         } else {
             */
-            course.querySelector(".bettercanvas-gpa-letter-grade").textContent = letter;
+        course.querySelector(".bettercanvas-gpa-letter-grade").textContent = letter;
 
-            let weightMultiplier = 0;
-            if (weight === "ap") {
-                weightMultiplier = 1;
-            } else if (weight === "honors") {
-                weightMultiplier = .5;
-            }
-            
-            qualityPoints += gpa * credits;
-            weightedQualityPoints += (gpa + weightMultiplier) * credits;
-            numCredits += credits;
+        let weightMultiplier = 0;
+        if (weight === "ap") {
+            weightMultiplier = 1;
+        } else if (weight === "honors") {
+            weightMultiplier = .5;
+        }
+
+        qualityPoints += gpa * credits;
+        weightedQualityPoints += (gpa + weightMultiplier) * credits;
+        numCredits += credits;
         //}
-
 
 
     });
@@ -1722,9 +1852,14 @@ function changeGPASettings(course_id, update) {
     calculateGPA2();
     chrome.storage.sync.get(["custom_cards", "cumulative_gpa"], storage => {
         if (course_id === "cumulative") {
-            chrome.storage.sync.set({ "cumulative_gpa": { ...storage["cumulative_gpa"], ...update } });
+            chrome.storage.sync.set({"cumulative_gpa": {...storage["cumulative_gpa"], ...update}});
         } else {
-            chrome.storage.sync.set({ "custom_cards": { ...storage["custom_cards"], [course_id]: { ...storage["custom_cards"][course_id], ...update } } });
+            chrome.storage.sync.set({
+                "custom_cards": {
+                    ...storage["custom_cards"],
+                    [course_id]: {...storage["custom_cards"][course_id], ...update}
+                }
+            });
         }
     });
 }
@@ -1734,25 +1869,38 @@ function createGPACalcCourse(location, course) {
     let customs;
     if (course.access_restricted_by_date === true) {
         return null;
-    } if (course.id === "cumulative") {
+    }
+    if (course.id === "cumulative") {
         customs = options["cumulative_gpa"];
     } else if (options.custom_cards && options.custom_cards[course.id]) {
         customs = options.custom_cards[course.id];
     } else {
         return;
-        customs = { "name": course.name, "hidden": false, "weight": "regular", "credits": 1, "gr": null };
+        customs = {"name": course.name, "hidden": false, "weight": "regular", "credits": 1, "gr": null};
     }
     if (customs.hidden === true) return;
 
-    let courseContainer = makeElement("div", location, { "className": course.id === "cumulative" ? "bettercanvas-gpa-cumulative" : "bettercanvas-gpa-course", "innerHTML": '<div class="bettercanvas-gpa-letter-grade"></div>' });
-    let courseName = makeElement("p", courseContainer, { "className": "bettercanvas-gpa-name", "textContent": customs.name === "" ? course.course_code : customs.name });
-    let changerContainer = makeElement("div", courseContainer, { "className": "bettercanvas-gpa-percent-container" });
+    let courseContainer = makeElement("div", location, {
+        "className": course.id === "cumulative" ? "bettercanvas-gpa-cumulative" : "bettercanvas-gpa-course",
+        "innerHTML": '<div class="bettercanvas-gpa-letter-grade"></div>'
+    });
+    let courseName = makeElement("p", courseContainer, {
+        "className": "bettercanvas-gpa-name",
+        "textContent": customs.name === "" ? course.course_code : customs.name
+    });
+    let changerContainer = makeElement("div", courseContainer, {"className": "bettercanvas-gpa-percent-container"});
 
-    let credits = makeElement("div", courseContainer, { "className": "bettercanvas-course-credits", "innerHTML": '<input class="bettercanvas-course-credit" value="1"></input><span class="bettercanvas-course-percent-sign">cr</span>' });
+    let credits = makeElement("div", courseContainer, {
+        "className": "bettercanvas-course-credits",
+        "innerHTML": '<input class="bettercanvas-course-credit" value="1"></input><span class="bettercanvas-course-percent-sign">cr</span>'
+    });
     let creditsChanger = credits.querySelector(".bettercanvas-course-credit");
     creditsChanger.value = customs.credits;
-    let changer = makeElement("input", changerContainer, { "className": "bettercanvas-course-percent" });
-    let percent = makeElement("span", changerContainer, { "className": "bettercanvas-course-percent-sign", "textContent": course.id === "cumulative" ? "/4" : "%" });
+    let changer = makeElement("input", changerContainer, {"className": "bettercanvas-course-percent"});
+    let percent = makeElement("span", changerContainer, {
+        "className": "bettercanvas-course-percent-sign",
+        "textContent": course.id === "cumulative" ? "/4" : "%"
+    });
     let courseGrade = course?.enrollments[0].has_grading_periods === true ? course.enrollments[0].current_period_computed_current_score : course.enrollments[0].computed_current_score;
 
     if (customs["gr"] !== null) {
@@ -1764,35 +1912,42 @@ function createGPACalcCourse(location, course) {
     }
 
     if (course.id !== "cumulative") {
-        let weightSelections = makeElement("form", courseContainer, { "className": "bettercanvas-course-weights" });
+        let weightSelections = makeElement("form", courseContainer, {"className": "bettercanvas-course-weights"});
         weightSelections.innerHTML = '<select name="weight-selection" class="bettercanvas-course-weight"><option value="dnc">Do not count</option><option value="regular">Regular/College</option><option value="honors">Honors</option><option value="ap">AP/IB</option></select>';
         let weightChanger = weightSelections.querySelector(".bettercanvas-course-weight");
-        weightChanger.value = changer.value === "--" ? "dnc" : customs.weight;   
-        weightChanger.addEventListener('change', () => changeGPASettings(course.id, { "weight": weightSelections.querySelector(".bettercanvas-course-weight").value }));
+        weightChanger.value = changer.value === "--" ? "dnc" : customs.weight;
+        weightChanger.addEventListener('change', () => changeGPASettings(course.id, {"weight": weightSelections.querySelector(".bettercanvas-course-weight").value}));
 
-        let useCustomGr = makeElement("input", courseContainer, { "className": "bettercanvas-course-customgr", "type": "checkbox", "checked": customs.gr !== null ? true : false });
-        let useCustomGrLabel = makeElement("span", courseContainer, { "className": "bettercanvas-course-customgr-label", "textContent": "Save custom grade" });
+        let useCustomGr = makeElement("input", courseContainer, {
+            "className": "bettercanvas-course-customgr",
+            "type": "checkbox",
+            "checked": customs.gr !== null ? true : false
+        });
+        let useCustomGrLabel = makeElement("span", courseContainer, {
+            "className": "bettercanvas-course-customgr-label",
+            "textContent": "Save custom grade"
+        });
         useCustomGr.addEventListener("input", () => {
             if (options["custom_cards"][course.id]) {
                 if (options["custom_cards"][course.id]["gr"] !== undefined && options["custom_cards"][course.id]["gr"] !== null) {
                     changer.value = courseGrade;
-                    changeGPASettings(course.id, { "gr": null });
+                    changeGPASettings(course.id, {"gr": null});
                 } else {
-                    changeGPASettings(course.id, { "gr": changer.value });
+                    changeGPASettings(course.id, {"gr": changer.value});
                 }
             }
         });
-    }   
+    }
 
     changer.addEventListener('input', (e) => {
         if (course.id === "cumulative" || (options["custom_cards"][course.id]["gr"] !== undefined && options["custom_cards"][course.id]["gr"] !== null)) {
-            changeGPASettings(course.id, { "gr": e.target.value });
+            changeGPASettings(course.id, {"gr": e.target.value});
         } else {
             calculateGPA2();
         }
     });
 
-    credits.querySelector(".bettercanvas-course-credit").addEventListener('input', () => changeGPASettings(course.id, { "credits": credits.querySelector(".bettercanvas-course-credit").value }));
+    credits.querySelector(".bettercanvas-course-credit").addEventListener('input', () => changeGPASettings(course.id, {"credits": credits.querySelector(".bettercanvas-course-credit").value}));
     return courseContainer;
 }
 
@@ -1808,7 +1963,10 @@ function setupGPACalc() {
             container2.style.display = options.gpa_calc === true ? "inline-block" : "none";
 
             container2.innerHTML = `<h3 class="bettercanvas-gpa-header">GPA</h3><div><div><p id="bettercanvas-gpa-unweighted"></p><p>Current</p></div><div style="display:${options["gpa_calc_weighted"] ? "block" : "none"}"><p id="bettercanvas-gpa-weighted"></p><p>Weighted</p></div><div style="display:${options["gpa_calc_cumulative"] ? "block" : "none"}"><p id="bettercanvas-gpa-cumulative"></p><p>Cumulative</p></div></div>`;
-            let editBtn = makeElement("button", container2, { "className": "bettercanvas-gpa-edit-btn", "textContent": "Edit Calculator" });
+            let editBtn = makeElement("button", container2, {
+                "className": "bettercanvas-gpa-edit-btn",
+                "textContent": "Edit Calculator"
+            });
 
             let container = document.querySelector(".bettercanvas-gpa") || document.createElement("div");
             container.className = "bettercanvas-gpa";
@@ -1823,7 +1981,10 @@ function setupGPACalc() {
             }
 
             let location = document.querySelector(".bettercanvas-gpa-courses");
-            let cumulative = createGPACalcCourse(location, { "id": "cumulative", "enrollments": [{ "has_grading_periods": true, "current_period_computed_current_score": 0 }] });
+            let cumulative = createGPACalcCourse(location, {
+                "id": "cumulative",
+                "enrollments": [{"has_grading_periods": true, "current_period_computed_current_score": 0}]
+            });
             cumulative.id = "bettercanvas-cumulative-gpa";
             result.forEach(course => createGPACalcCourse(location, course));
 
@@ -1851,10 +2012,11 @@ Dashboard notes
 */
 
 let dashboardNotesTimer;
+
 function delayDashboardNotesStorage(text) {
     clearTimeout(dashboardNotesTimer);
     dashboardNotesTimer = setTimeout(() => {
-        chrome.storage.sync.set({ dashboard_notes_text: text });
+        chrome.storage.sync.set({dashboard_notes_text: text});
     }, 1000);
 }
 
@@ -1985,9 +2147,9 @@ function showUpdateMsg() {
     }
 
     // first creation 
-    div = makeElement("div", el, { "id": "bettercanvas-update-msg" });
-    makeElement("p", div, { "textContent": options.update_msg });
-    const close = makeElement("button", div, { "id": "bettercanvas-update-close", "textContent": "Close" });
+    div = makeElement("div", el, {"id": "bettercanvas-update-msg"});
+    makeElement("p", div, {"textContent": options.update_msg});
+    const close = makeElement("button", div, {"id": "bettercanvas-update-close", "textContent": "Close"});
     close.addEventListener("click", () => {
         readUpdate();
         div.remove();
@@ -1995,7 +2157,7 @@ function showUpdateMsg() {
 }
 
 function readUpdate() {
-    chrome.storage.sync.set({ "update_msg": "" });
+    chrome.storage.sync.set({"update_msg": ""});
 }
 
 /*
@@ -2028,7 +2190,7 @@ function cleanCustomAssignments() {
                         changed = true;
                     }
                 }
-                if (changed) chrome.storage.sync.set({ [overflow]: storage[overflow] });
+                if (changed) chrome.storage.sync.set({[overflow]: storage[overflow]});
             });
 
         });
@@ -2043,7 +2205,7 @@ function setupCustomURL() {
             getCards(res).then(() => {
                 setTimeout(() => {
                     console.log("Better Canvas - setting custom domain to " + domain);
-                    chrome.storage.sync.set({ custom_domain: [domain] }).then(location.reload());
+                    chrome.storage.sync.set({custom_domain: [domain]}).then(location.reload());
                 }, 100);
             });
         } else {
@@ -2066,9 +2228,12 @@ function getColors() {
         colors.then(data => {
             let cards = options.custom_cards_3;
             Object.keys(cards).forEach(key => {
-                cards[key] = { ...cards[key], "color": data["custom_colors"]["course_" + key] ? data["custom_colors"]["course_" + key] : null };
+                cards[key] = {
+                    ...cards[key],
+                    "color": data["custom_colors"]["course_" + key] ? data["custom_colors"]["course_" + key] : null
+                };
             });
-            chrome.storage.sync.set({ "custom_cards_3": cards });
+            chrome.storage.sync.set({"custom_cards_3": cards});
         });
     }
 }
@@ -2157,11 +2322,14 @@ function rgbToHsl(r, g, b) {
         s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
         switch (max) {
             case r:
-                h = (g - b) / d + (g < b ? 6 : 0); break;
+                h = (g - b) / d + (g < b ? 6 : 0);
+                break;
             case g:
-                h = (b - r) / d + 2; break;
+                h = (b - r) / d + 2;
+                break;
             case b:
-                h = (r - g) / d + 4; break;
+                h = (r - g) / d + 4;
+                break;
         }
         h /= 6;
     }
@@ -2187,18 +2355,22 @@ function getRelativeDate(date, short = false) {
     }
     timeSince = Math.round(timeSince);
     let relative = timeSince + (short ? "" : " ") + time + (timeSince > 1 && !short ? "s" : "");
-    return { time: relative, ms: now.getTime() - date.getTime() };
+    return {time: relative, ms: now.getTime() - date.getTime()};
 }
 
 const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
 function formatTodoDate(date, submissions, hr24) {
-    let { time, ms } = getRelativeDate(date);
+    let {time, ms} = getRelativeDate(date);
     let fromNow = ms < 0 ? "in " + time : time + " ago";
     let dueSoon = false;
     if (submissions && submissions.submitted === false && ms >= -21600000) {
         dueSoon = true;
     }
-    return { "dueSoon": dueSoon, "date": months[date.getMonth()] + " " + date.getDate() + " at " + (date.getHours() - (hr24 ? "" : date.getHours() > 12 ? 12 : 0)) + ":" + (date.getMinutes() < 10 ? "0" : "") + date.getMinutes() + (hr24 ? "" : date.getHours() >= 12 ? "pm" : "am") + " (" + fromNow + ")" };
+    return {
+        "dueSoon": dueSoon,
+        "date": months[date.getMonth()] + " " + date.getDate() + " at " + (date.getHours() - (hr24 ? "" : date.getHours() > 12 ? 12 : 0)) + ":" + (date.getMinutes() < 10 ? "0" : "") + date.getMinutes() + (hr24 ? "" : date.getHours() >= 12 ? "pm" : "am") + " (" + fromNow + ")"
+    };
 }
 
 function formatCardDue(date) {
@@ -2215,7 +2387,7 @@ function logError(e) {
         if (storage.errors.length > 20) {
             storage["errors"] = [];
         }
-        chrome.storage.local.set({ "errors": storage["errors"].concat(e.stack) });
+        chrome.storage.local.set({"errors": storage["errors"].concat(e.stack)});
 
         console.log(e.stack);
         console.log(storage["errors"].concat(e.stack));
