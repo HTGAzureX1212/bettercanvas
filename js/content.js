@@ -1635,6 +1635,10 @@ span[data-testid="submission-tray"]>div>div>div>div[class$="-view"] {
 .selected-assignment {
     background: var(--bcbackground-1) !important;
 }
+
+[class$="pill"] {
+    background: var(--bcbackground-0) !important;
+}
 `;
     let css = (options.device_dark === true ? "@media (prefers-color-scheme: dark) {" : "") + ":root{";
     Object.keys(options.dark_preset).forEach(key => {
