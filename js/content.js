@@ -1606,11 +1606,21 @@ select.ic-Input:focus, textarea.ic-Input:focus, input[type=text].ic-Input:focus,
 
 [class*="-textInput__facade"] {
     background: var(--bcbackground-1);
-    border: 1px solid var(--bcbackground-2-5) !important;
+    border: 1px solid var(--bcborders) !important;
 }
 
 [class*="-inlineSVG-svgIcon"] {
     color: var(--bctext-0);
+}
+
+a[class~="toggle_rubric_assessments_link"] {
+    background: var(--bcbackground-2) !important;
+    border: 1px solid var(--bcborders) !important;
+}
+
+a[class~="toggle_comments_link"] {
+    background: var(--bcbackground-2) !important;
+    border: 1px solid var(--bcborders) !important;
 }
 `;
     let css = (options.device_dark === true ? "@media (prefers-color-scheme: dark) {" : "") + ":root{";
