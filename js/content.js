@@ -1591,7 +1591,28 @@ select.ic-Input:focus, textarea.ic-Input:focus, input[type=text].ic-Input:focus,
 .course-list-unpublished-course-row {
     background: var(--bcbackground-1);
     color: var(--bctext-2)
-}`;
+}
+
+.react-rubric table th,
+.react-rubric table td {
+    background: var(--bcbackground--1);
+    color: var(--bctext-1);
+    border: 2px solid var(--bcbackground-2);
+}
+
+.react-rubric table td div.rating-tier {
+    border-left: 3px solid var(--bcbackground-3);
+}
+
+[class*="-textInput__facade"] {
+    background: var(--bcbackground-1);
+    border: 1px solid var(--bcbackground-2-5) !important;
+}
+
+[class*="-inlineSVG-svgIcon"] {
+    color: var(--bctext-0);
+}
+`;
     let css = (options.device_dark === true ? "@media (prefers-color-scheme: dark) {" : "") + ":root{";
     Object.keys(options.dark_preset).forEach(key => {
         css += "--bc" + key + ":" + options.dark_preset[key] + ";";

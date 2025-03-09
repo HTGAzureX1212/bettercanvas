@@ -9,9 +9,12 @@ chrome.runtime.onInstalled.addListener(function () {
         },
         "sync": {
             "dark_preset": {
+                "background--1": "#111111",
                 "background-0": "#161616",
                 "background-1": "#1e1e1e",
                 "background-2": "#262626",
+                "background-2-5": "#3c3c3c",
+                "background-3": "#5a5a5a",
                 "borders": "#3c3c3c",
                 "text-0": "#f5f5f5",
                 "text-1": "#e2e2e2",

@@ -53,21 +53,19 @@ To install, run, and build with this repository,
 - Clone the repository locally with
 
 ```bash
-  git clone https://github.com/ksucpea/bettercanvas.git
+  git clone https://github.com/HTGAzureX1212/bettercanvas.git
 ```
 
-- Visit `chrome://extensions` in your browser.
-- Enable developer mode by toggling the switch in the upper right corner of the viewport.
-- Click the "Load upacked" button in the header.
-- When prompted to open a file, select the root directory of this repository.
+Instructions for Firefox and derivatives:
 
-## Usage
+- Visit `about:config` and set `xpinstall.signatures.required` to `false`.
+- Build the extension with `web-ext build`.
+- Visit `about:addons` in your browser.
+- Click the "Settings > Install Add-on from File" and select the built archive.
 
-To use Better Canvas, select your browser below to install the extension.
+Instructions for Chrome and derivatives:
 
-[Chrome](https://chrome.google.com/webstore/detail/better-canvas/cndibmoanboadcifjkjbdpjgfedanolh)
-
-[Firefox](https://addons.mozilla.org/addon/better-canvas/)
+- *this will be updated soon*
 
 ### How to use
 
@@ -78,26 +76,9 @@ To use Better Canvas, select your browser below to install the extension.
 
 ## Version Notes
 
-#### Update 5.10
+#### Update 5.13
 
-- Fixed dark mode bug in discussion text boxes
-- Added new themes + fonts
-- Card colors now change instantly
-- Dark mode fixer feature
-- Card customization now shows preview of image
-- New sidebar options
-- Dark mode buttons preview their appearance
-- "Remove sidebar logo" feature
-- "Hide recent feedback" feature
-- Menu redesign
-- Fixed card assignment bug
-- Card assignment efficiency improvements
-- Dark mode rework
-- Dark mode now syncs
-- Option to use device dark mode settings
-- Improved todo list
-- "Color coded tab icons" feature
-- "Use card colors" option for todo list
+- Fixed more dark mode issues
 
 ## Color Reference
 
@@ -114,8 +95,6 @@ To use Better Canvas, select your browser below to install the extension.
 ### Add a new feature
 
 To add a new feature, please follow these guidelines.
-
-Note: I will probably make this automated in the future but it's a bit of work right now.
 
 #### Identifier
 
@@ -265,19 +244,6 @@ Learn more about tree commands for Linux/Unix [here](https://www.geeksforgeeks.o
   ```
 
 Learn more about tree commands for Windows [here](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree).
-
-## Authors
-
-#### Owner
-
-- [ksucpea](https://github.com/ksucpea)
-
-#### Contributors
-
-- [fudgeu](https://github.com/fudgeu)
-- [Tibo Geeraerts](https://github.com/tibogeeraerts)
-- [Jacob Mungle](https://github.com/Jelgnum)
-- [FireIsGood](https://github.com/FireIsGood)
 
 ## License
 

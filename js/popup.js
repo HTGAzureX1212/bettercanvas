@@ -13,9 +13,12 @@ const defaultOptions = {
     },
     "sync": {
         "dark_preset": {
+            "background--1": "#111111",
             "background-0": "#161616",
             "background-1": "#1e1e1e",
             "background-2": "#262626",
+            "background-2-5": "#3c3c3c",
+            "background-3": "#5a5a5a",
             "borders": "#3c3c3c",
             "text-0": "#f5f5f5",
             "text-1": "#e2e2e2",
@@ -1193,6 +1196,7 @@ function displaySavedThemes() {
 function getTheme(name) {
 
     const themes = [
+        /*
         {
             "color": "brown",
             "score": 4441,
@@ -11563,9 +11567,6 @@ function getTheme(name) {
             },
             "preview": "https://i.pinimg.com/736x/6b/6b/cc/6b6bccd3f1eb0e15b774a0d9f86d4c5d.jpg"
         },
-
-
-        /*
         { "title": "Motivational by Adrianna", "exports": { "disable_color_overlay": true, "gradient_cards": false, "dark_mode": true, "dark_preset": { "background-0": "#202020", "background-1": "#2e2e2e", "background-2": "#4e4e4e", "borders": "#404040", "links": "#56Caf0", "sidebar": "#2e2e2e", "sidebar-text": "#f5f5f5", "text-0": "#f5f5f5", "text-1": "#e2e2e2", "text-2": "#ababab" }, "custom_cards": ["https://i.pinimg.com/474x/1d/3a/0e/1d3a0e1b3543d873cf8de35a2911c03f.jpg", "https://i.pinimg.com/474x/dd/e8/27/dde8279847d6f508b426a094a5aac28a.jpg", "https://i.pinimg.com/474x/ee/b4/60/eeb4601e423baccb5a8e5f091ec8cc9f.jpg", "https://i.pinimg.com/474x/9a/9f/e3/9a9fe35de7a80fb8cc3079167c2b01a8.jpg", "https://i.pinimg.com/474x/eb/37/af/eb37afabc5d1f0138c7ba5a1810158ea.jpg", "https://i.pinimg.com/474x/63/66/dd/6366dd0b47728a60f1d81262ab618724.jpg", "https://i.pinimg.com/474x/13/47/96/13479630adf41bc42c4b542590282526.jpg"], "card_colors": ["#000000"], "custom_font": { "family": "'Open Sans'", "link": "Open+Sans:wght@400;700" } }, "preview": "https://i.pinimg.com/474x/1d/3a/0e/1d3a0e1b3543d873cf8de35a2911c03f.jpg" },
         { "title": "Chainsaw by Mykol", "exports": { "disable_color_overlay": true, "gradient_cards": false, "dark_mode": true, "dark_preset": { "background-0": "#0f0f0f", "background-1": "#0c0c0c", "background-2": "#141414", "borders": "#1e1e1e", "links": "#f49e0b", "sidebar": "#0c0c0c", "sidebar-text": "#f5f5f5", "text-0": "#f5f5f5", "text-1": "#e2e2e2", "text-2": "#ababab" }, "custom_cards": ["https://pbs.twimg.com/media/FjCyGhvXwAAjFqn.jpg", "https://w.wallhaven.cc/full/dp/wallhaven-dpvd2g.jpg", "https://i.pinimg.com/originals/31/3e/57/313e570a0cf1493790669461d65b7137.jpg", "https://i.ytimg.com/vi/5SdHEv04Wic/maxresdefault.jpg", "https://pbs.twimg.com/media/E5htXu2WEAM4WiL.jpg"], "card_colors": ["#e36d0d"], "custom_font": { "family": "'Rubik'", "link": "Rubik:wght@400;700" } }, "preview": "https://i.pinimg.com/originals/31/3e/57/313e570a0cf1493790669461d65b7137.jpg" },
         { "title": "LeonK by BlancaC", "exports": { "disable_color_overlay": false, "gradient_cards": false, "dark_mode": true, "dark_preset": { "background-0": "#232425", "background-1": "#1e1e1e", "background-2": "#262626", "borders": "#4e1313", "links": "#e255b5", "sidebar": "linear-gradient(#b88ea5c7, #6b0a3ec7), center url(\"https://i.pinimg.com/736x/71/a7/b1/71a7b19b26616a7e54c802b8ae898080.jpg\")", "sidebar-text": "#fdd3e7", "text-0": "#f5f5f5", "text-1": "#e2e2e2", "text-2": "#ababab" }, "custom_cards": ["https://i.pinimg.com/736x/d4/a1/6e/d4a16ee82c8e45ffbc03611808ec3202.jpg", "https://i.pinimg.com/474x/ab/fc/50/abfc50beea6f05c428a0a42c415d1a2b.jpg", "https://i.pinimg.com/736x/11/d9/22/11d92290bd92f6719e687f86a734db3d.jpg", "https://game.capcom.com/residentevil/pc/img/umbrella/20230324/utu1_31-1.jpg", "https://cdn.vox-cdn.com/thumbor/Og1IT6M5rO4C_z3eIodSjBB6P-o=/0x0:2854x1560/1200x0/filters:focal(0x0:2854x1560):no_upscale()/cdn.vox-cdn.com/uploads/chorus_asset/file/24774139/5.Leon.Culp.jpg", "https://i.pinimg.com/236x/07/08/80/0708805a022e79d7dbd8077bba877a8d.jpg", "https://www.svg.com/img/gallery/the-worst-things-resident-evils-leon-kennedy-has-ever-done/intro-1657287618.jpg", "https://preview.redd.it/leon-kennedy-is-absurdly-attractive-in-resident-evil-4-v0-24o386br63ta1.jpg?width=640&crop=smart&auto=webp&s=29215993db324eec1a0c3153e6d442a2eca2d463", "https://i.pinimg.com/736x/3a/d0/e0/3ad0e09f1c249f5ea858564036d4ba6e.jpg"], "card_colors": ["#ff0a54", "#ff5c8a", "#ff85a1", "#ff99ac", "#fbb1bd", "#ff0a54", "#ff5c8a", "#ff85a1", "#ff99ac"], "custom_font": { "family": "'Tektur'", "link": "Tektur:wght@400;700" } }, "preview": "https://i.pinimg.com/236x/07/08/80/0708805a022e79d7dbd8077bba877a8d.jpg" },
